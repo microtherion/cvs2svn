@@ -15,10 +15,12 @@
 # to make an image for testing cvs2svn and to run those tests using
 # the image.
 
-FROM debian:jessie AS run
+FROM debian:buster AS run
 
-RUN apt-get update && \
-    apt-get install -y \
+ARG ENTRYPOINT=cvs2svn
+RUN perl -i.bak -ne "print $' if /^# /" /etc/apt/sources.list
+RUN (apt-get update || true) && \
+    apt-get install -y --force-yes \
         python \
         python-bsddb3 \
         subversion \
@@ -36,7 +38,7 @@ VOLUME ["/cvs"]
 # A volume for storing temporary files can be mounted here:
 VOLUME ["/tmp"]
 
-ENTRYPOINT ["cvs2svn"]
+ENTRYPOINT [$ENTRYPOINT]
 
 FROM run AS test
 

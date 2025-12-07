@@ -5,6 +5,9 @@
 # that this option only affects the "install" and "check" targets:
 PYTHON := python
 
+# Prefix for complete docker image name
+IMG_PREFIX := microtherion
+
 all:
 	@echo "Supported make targets:"
 	@echo "    man -- Create manpages for the main programs"
@@ -67,7 +70,8 @@ clean:
 # or mount a different directory there.
 .PHONY: docker-image
 docker-image:
-	docker build --target=run -t cvs2svn .
+	docker buildx build --platform linux/amd64,linux/arm64 --build-arg ENTRYPOINT=cvs2svn --target=run -t ${IMG_PREFIX}/cvs2svn --push .
+	docker buildx build --platform linux/amd64,linux/arm64 --build-arg ENTRYPOINT=cvs2git --target=run -t ${IMG_PREFIX}/cvs2git --push .
 
 # Create a docker image, then use it to run the automated tests.
 .PHONY: docker-test
